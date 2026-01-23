@@ -29,12 +29,13 @@ ECHO:printing out on the terminal we wanna disable this
 TCSAFLUSH argument specifies when to apply the change:
  in this case, it waits for all pending output to be written to the terminal,
 and also discards any input that hasn’t been read.*/
+    tcgetattr(STDIN_FILENO, &original_attributes);
+    atexit(disablerawmode);//calls the function disablerawmode() automatically at exit
 
     struct termios raw;//termios is a struct declared inside of termios.h
 
     tcgetattr(STDIN_FILENO, &raw);//gets the current attributes into raw
     
-    atexit(disablerawmode);//calls the function disablerawmode() automatically at exit
     //atexit provided by stdlib
 
     raw.c_lflag &= ~(ECHO|ICANON);//changes raw.c_lflag and disables the ECHO
@@ -68,7 +69,7 @@ int main(){
 
         }
         else{
-            printf("%d/n%c",c,c);
+            printf("%d('%c')\n",c,c);
         }
     }
 
