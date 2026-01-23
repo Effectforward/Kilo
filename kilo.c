@@ -1,4 +1,5 @@
 #include<stdio.h>
+#include <ctype.h>
 #include<termios.h>
 #include <unistd.h>
 #include<stdlib.h>
@@ -58,6 +59,18 @@ int main(){
     read() returns the number of bytes that it read
     and returns 0 when end of file is reached*/
     
-    while (read(STDIN_FILENO, &c, 1) ==1 && c!='q');
+    while (read(STDIN_FILENO, &c, 1) ==1 && c!='q'){
+        //iscntrl comes from ctype and checks if the character is from control characters
+        //control characters are non printable asccii characters refer nto ASCII table for more info
+        //if it is one of the control charcters it prints its decimal
+        if (iscntrl(c)){
+            printf("%d",c);
+
+        }
+        else{
+            printf("%d/n%c",c,c);
+        }
+    }
+
     return 0;
 }
