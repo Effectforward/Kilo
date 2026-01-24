@@ -49,12 +49,18 @@ and also discards any input that hasn’t been read.*/
     
     //atexit provided by stdlib
 
-    raw.c_lflag &= ~(ECHO|ICANON);//changes raw.c_lflag and disables the ECHO
+    raw.c_lflag &= ~(ECHO|ICANON|ISIG|IEXTEN);//disables echo,canonical mode and ctrl + c (SIGINT) and ctrl +z (SIGTSTP) signals
+    //IEXTEN disables ctrl + v and it also disables crl + o on macos
     //uses ICANON flag to disable cooked mode
     //don't quite get it how it works but basically it compliments the ECHO
     //and then stores it inside of raw.c_lflag to revert it's behaviour
     //man it's some low level shit which i am unable to wrap my head around
-
+    raw.c_iflag &= ~(ICRNL|IXON);//fixes ctrl + m
+    /*By default, Ctrl-S and Ctrl-Q are used for software flow control. Ctrl-S stops data from being transmitted to the terminal until you press Ctrl-Q
+    IXON comes from <termios.h>. The I stands for “input flag” (which it is, unlike the other I flags we’ve seen so far) and XON comes from the names 
+    of the two control characters that Ctrl-S and Ctrl-Q produce: XOFF to pause transmission and XON to resume transmission.*/
+    raw.c_oflag &= ~(OPOST);//disbales any kind of output specially needed for diabling of carriage return
+    //which was ctrl + m, we already disbaled it for our input and now this line disbles it for output as well
     tcsetattr(STDIN_FILENO, TCSAFLUSH, &raw);
     //after changing the flag it writes it
     //god vim is so much faster, vscode is a pain 
@@ -75,10 +81,9 @@ int main(){
         //iscntrl comes from ctype and checks if the character is from control characters
         //control characters are non printable asccii characters refer nto ASCII table for more info
         //if it is one of the control charcters it prints its decimal
-        if (iscntrl(c)){
-            printf("%d",c);
+        if (iscntrl(c))
+            printf("%d\r\n",c);
 
-        }
         else{
             printf("%d('%c')\n",c,c);
         }
