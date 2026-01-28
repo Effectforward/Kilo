@@ -88,7 +88,7 @@ int main(){
             printf("%d\r\n",c);
 
         else{
-            printf("%d('%c')\n",c,c);
+            printf("%d('%c')\n\r",c,c);
         }
     }
 
